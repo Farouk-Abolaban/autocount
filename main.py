@@ -28,21 +28,21 @@ def compare_counts():
         for i in range(1, len(data)):  
             part_number = data[i][0]
             part_description = data[i][1]
-            scale_count = data[i][2]
+            system_count = data[i][2]
             technician_count = data[i][3]
 
             # Make sure we are comparing only integers
             try:
-                scale_count = int(scale_count)
+                system_count = int(system_count)
                 technician_count = int(technician_count)
 
             # Skip a row if it has an invalid value
             except ValueError:
                 continue  
             
-            if scale_count != technician_count:
+            if system_count != technician_count:
                 highlight_row(worksheet, i + 1)
-                send_email(van_name, part_number, part_description, scale_count, technician_count)
+                send_email(van_name, part_number, part_description, system_count, technician_count)
 
 #Function to highlight rows with discrepencies
 def highlight_row(worksheet, row):
@@ -58,7 +58,7 @@ def highlight_row(worksheet, row):
 
     worksheet.update_cells(flat_cells) 
 
-def send_email(van_name, part_number, part_description, scale_count, technician_count):
+def send_email(van_name, part_number, part_description, system_count, technician_count):
     # Sends an email to the manager for discrepancies, including the van name
     subject = f"Inventory Discrepancy in {van_name}: Part {part_number}"
     body = f"""
@@ -66,7 +66,7 @@ def send_email(van_name, part_number, part_description, scale_count, technician_
 
     - Part Number: {part_number}
     - Description: {part_description}
-    - Scale Count: {scale_count}
+    - System Count: {system_count}
     - Technician Count: {technician_count}
 
     Please review this discrepancy.
