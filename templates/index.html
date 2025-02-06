@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inventory Checker</title>
+    <script>
+      function loadInventory() {
+        fetch("/get_data")
+          .then((response) => response.json())
+          .then((data) => {
+            let container = document.getElementById("inventoryContainer");
+            container.innerHTML = "";
+
+            for (const [vanName, sheetData] of Object.entries(data)) {
+              let section = document.createElement("div");
+              section.innerHTML = `<h2>${vanName}</h2>`;
+
+              let table = document.createElement("table");
+              table.border = "1";
+
+              // Create table headers
+              let headerRow = document.createElement("tr");
+              sheetData.headers.forEach((header) => {
+                let th = document.createElement("th");
+                th.innerText = header;
+                headerRow.appendChild(th);
+              });
+              table.appendChild(headerRow);
+
+              // Create table rows
+              sheetData.rows.forEach((row) => {
+                let tr = document.createElement("tr");
+                row.forEach((cell) => {
+                  let td = document.createElement("td");
+                  td.innerText = cell;
+                  tr.appendChild(td);
+                });
+                table.appendChild(tr);
+              });
+
+              section.appendChild(table);
+              container.appendChild(section);
+            }
+          });
+      }
+
+      function checkDiscrepancies() {
+        fetch("/check_discrepancies", { method: "POST" })
+          .then((response) => response.json())
+          .then((data) => {
+            alert("Checked discrepancies. Found: " + data.mismatches.length);
+            loadInventory(); // Reload table after checking
+          });
+      }
+
+      window.onload = loadInventory;
+    </script>
+  </head>
+  <body>
+    <h1>Inventory Discrepancy Checker</h1>
+    <button onclick="checkDiscrepancies()">Check for Discrepancies</button>
+    <div id="inventoryContainer"></div>
+  </body>
+</html>
